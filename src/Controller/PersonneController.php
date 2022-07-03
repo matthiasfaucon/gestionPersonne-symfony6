@@ -42,6 +42,21 @@ class PersonneController extends AbstractController
         ]);
     }
 
+    #[Route('/{id<\d+>}', name: 'personne.detail')]
+    public function detail(Personne $personne = null): Response
+    {
+        // Pas nécessaire avec le param Convertor 
+        // $repository = $doctrine->getRepository(Personne::class);
+        // $personne = $repository->find($id);
 
+        if(!$personne){
+            $this->addFlash('error', "la personne n'existe pas");
+            return $this->redirectToRoute("personne.list");
+        }
+
+        return $this->render('personne/detail.html.twig', [
+            'personne' => $personne,
+        ]);
+    }
 }
 
