@@ -41,7 +41,7 @@ class PersonneController extends AbstractController
             'formPassed'=> $form->createView()
         ]);
     }
-
+    
     #[Route('/{id<\d+>}', name: 'personne.detail')]
     public function detail(Personne $personne = null): Response
     {
@@ -58,5 +58,6 @@ class PersonneController extends AbstractController
             'personne' => $personne,
         ]);
     }
+
 }
 
