@@ -86,6 +86,32 @@ class PersonneController extends AbstractController
         $manager = $doctrine->getManager();
         $manager->remove($personne);
         $manager->flush(); // exécute la transaction 
+        $this->addFlash('success', 'La personne a bien été modifié');
+    }
+    //sinon
+    else{
+        //message d'erreur
+        $this->addFlash('error', 'La personne ne peut pas être supprimé, vérifié son existence');
+    }
+        return $this->redirectToRoute('personne.list');  
+    }
+
+    #[Route('/udpate/{id}/{nom}/{prenom}/{age}', name: 'personne.update')]
+    public function updatePersonne(Personne $personne = null, ManagerRegistry $doctrine, $nom, $prenom, $age): RedirectResponse
+    {
+    // Vérifier que la personne existe
+        // si elle existe
+    if($personne){
+        // mise à jour de la personne
+        $manager = $doctrine->getManager();
+
+        $personne->setNom($nom);
+        $personne->setPrenom($prenom);
+        $personne->setAge($age);
+        $manager->persist($personne); // si il y a un id elle sait que c'est une mise à jour sinon elle sait que c'est un ajout 
+        
+        $manager->flush(); // exécute la transaction 
+        
         $this->addFlash('success', 'La personne a bien été supprimé');
     }
     //sinon
