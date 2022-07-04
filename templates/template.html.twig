@@ -384,7 +384,7 @@
 							Generate Report</a>
 					</div>
 
-                        <div class="row col-auto mb-2">
+                        <div class="row col-auto mb-1">
                                 {% for message in app.session.flashbag.get('info') %}
                                     <div class="list-group-item list-group-item-info ">
                                         <p class="mb-0">Information:
@@ -417,7 +417,6 @@
 					<!-- Content Row -->
 					<div class="row">
 						{% block PageBody %}
-                       
 							Corps de la page
 						{% endblock %}
 					</div>

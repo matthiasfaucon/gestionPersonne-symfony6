@@ -59,6 +59,17 @@ class PersonneController extends AbstractController
         ]);
     }
 
+    #[Route('/filter/{ageMin}/{ageMax}', name: 'personne.filter')]
+    public function displayFilteredPersonne(ManagerRegistry $doctrine, $ageMin, $ageMax): Response
+    {
+        $repository = $doctrine->getRepository(Personne::class);
+        $personnes = $repository->FindPersonByAgeInterval($ageMin, $ageMax);
+        
+        return $this->render('personne/index.html.twig', [
+            'personnes' => $personnes
+        ]);
+    }
+
     #[Route('/{id<\d+>}', name: 'personne.detail')]
     public function detail(Personne $personne = null): Response
     {
@@ -91,12 +102,12 @@ class PersonneController extends AbstractController
     //sinon
     else{
         //message d'erreur
-        $this->addFlash('error', 'La personne ne peut pas être supprimé, vérifié son existence');
+        $this->addFlash('error', 'La personne ne peut pas être supprimé, vérifiez son existence');
     }
         return $this->redirectToRoute('personne.list');  
     }
 
-    #[Route('/udpate/{id}/{nom}/{prenom}/{age}', name: 'personne.update')]
+    #[Route('/update/{id}/{nom}/{prenom}/{age}', name: 'personne.update')]
     public function updatePersonne(Personne $personne = null, ManagerRegistry $doctrine, $nom, $prenom, $age): RedirectResponse
     {
     // Vérifier que la personne existe
@@ -111,15 +122,15 @@ class PersonneController extends AbstractController
         $manager->persist($personne); // si il y a un id elle sait que c'est une mise à jour sinon elle sait que c'est un ajout 
         
         $manager->flush(); // exécute la transaction 
-        
+
         $this->addFlash('success', 'La personne a bien été supprimé');
     }
     //sinon
     else{
         //message d'erreur
-        $this->addFlash('error', 'La personne ne peut pas être supprimé, vérifié son existence');
+        $this->addFlash('error', 'La personne ne peut pas être supprimé, vérifiez son existence');
     }
-        return $this->redirectToRoute('personne.list');  
+        return $this->redirectToRoute('personne.list');
     }
 }
 
