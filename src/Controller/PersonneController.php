@@ -11,24 +11,22 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-#[Route('/personne')]
+#[Route('personne')]
 
 class PersonneController extends AbstractController
 {
 
-    #[Route('/', name: 'personne.list')]
-    public function displayPersonne(ManagerRegistry $doctrine, Request $request): Response
+    #[Route('/add', name: 'personne.add')]
+    public function addPerson(ManagerRegistry $doctrine, Request $request): Response
     {
         $personne = new Personne(); //initialisation d'un constructeur 
         $repository = $doctrine->getRepository(Personne::class);
-        $personnes = $repository->findAll();
 
         $form = $this->createForm(PersonneType::class, $personne);
         $form->handleRequest($request);
 
         if($form->isSubmitted()){
             $entiteManager = $doctrine->getManager();
-            $personne->setIsCheckedTodo(false);
             $entiteManager->persist($personne);
             
             $entiteManager->flush();
@@ -36,12 +34,31 @@ class PersonneController extends AbstractController
             return $this->redirectToRoute('personne.list');
         }
         
-        return $this->render('personne/index.html.twig', [
-            'personnes' => $personnes,
-            'formPassed'=> $form->createView()
+        return $this->render('personne/addPerson.html.twig', [
+            'personne' => $personne,
+            'formPassed'=> $form->createView(),
         ]);
     }
-    
+
+    #[Route('/{page<\d+>?1}/{nbrPerPage<\d+>?12}', name: 'personne.list')]
+    public function displayPersonne(ManagerRegistry $doctrine, Request $request, $page, $nbrPerPage): Response
+    {
+        $personne = new Personne(); //initialisation d'un constructeur 
+        $repository = $doctrine->getRepository(Personne::class);
+        $nbrPersonne = $repository->count([]);
+        $nbrPages = ceil($nbrPersonne / $nbrPerPage);
+
+        $personnes = $repository->findBy([], [], $nbrPerPage, ($nbrPerPage * ($page - 1)));
+        
+        return $this->render('personne/index.html.twig', [
+            'personnes' => $personnes,
+            'isPaginated' => true,
+            'nbrPages' => $nbrPages,
+            'page' => $page,
+            'nbrPerPage' => $nbrPerPage
+        ]);
+    }
+
     #[Route('/{id<\d+>}', name: 'personne.detail')]
     public function detail(Personne $personne = null): Response
     {
@@ -59,5 +76,24 @@ class PersonneController extends AbstractController
         ]);
     }
 
+    #[Route('/delete/{id}', name: 'personne.delete')]
+    public function deleteTodo(Personne $personne = null, ManagerRegistry $doctrine): RedirectResponse
+    {
+    // On récupère la todo
+        // si elle existe
+    if($personne){
+        // suppression de la todo
+        $manager = $doctrine->getManager();
+        $manager->remove($personne);
+        $manager->flush(); // exécute la transaction 
+        $this->addFlash('success', 'La personne a bien été supprimé');
+    }
+    //sinon
+    else{
+        //message d'erreur
+        $this->addFlash('error', 'La personne ne peut pas être supprimé, vérifié son existence');
+    }
+        return $this->redirectToRoute('personne.list');  
+    }
 }
 
