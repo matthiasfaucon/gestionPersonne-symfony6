@@ -63,10 +63,23 @@ class PersonneController extends AbstractController
     public function displayFilteredPersonne(ManagerRegistry $doctrine, $ageMin, $ageMax): Response
     {
         $repository = $doctrine->getRepository(Personne::class);
-        $personnes = $repository->FindPersonByAgeInterval($ageMin, $ageMax);
+        $personnes = $repository->findPersonByAgeInterval($ageMin, $ageMax);
         
         return $this->render('personne/index.html.twig', [
             'personnes' => $personnes
+        ]);
+    }
+
+    #[Route('/stats/{ageMin}/{ageMax}', name: 'personne.stats')]
+    public function displayFilteredPersonneStats(ManagerRegistry $doctrine, $ageMin, $ageMax): Response
+    {
+        $repository = $doctrine->getRepository(Personne::class);
+        $stats = $repository->findPersonByAgeIntervalStatistic($ageMin, $ageMax);
+        
+        return $this->render('personne/personStat.html.twig', [
+            'stats' => $stats[0],
+            'ageMin' => $ageMin,
+            'ageMax' => $ageMax
         ]);
     }
 

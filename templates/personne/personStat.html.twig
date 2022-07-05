@@ -1,0 +1,47 @@
+{% extends "template.html.twig" %}
+
+{% block BlockTitle %}
+    Statistiques
+{% endblock %}
+
+{% block PageBody %}
+    <div class="col-xl-4 col-md-6 mb-5"> 
+        <div class="card border-left-primary shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="row col-10 pl-3">
+                        <div class="h6 font-weight-bold text-gray-800">
+                            La moyenne d'âge entre {{ ageMin }} ans et {{ ageMax }} ans est de :
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row col-10 pl-3">
+					<div class="h4 font-weight-bold text-gray-800">
+						{{ stats['ageMoyen'] | round(2, 'ceil') }}
+					</div>
+				</div>
+            </div>
+        </div>
+	</div>
+
+    <div class="col-xl-4 col-md-6 mb-5"> 
+        <div class="card border-left-primary shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="row col-10 pl-3">
+                        <div class="h6 font-weight-bold text-gray-800">
+                            Nombre de personnes entre {{ ageMin }} ans et {{ ageMax }} ans :
+                        </div>
+                    </div>
+
+                    <div class="row col-10 pl-3">
+                        <div class="h4 font-weight-bold text-gray-800">
+                            {{ stats['numberOfPersons'] }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+	</div>
+{% endblock %}
