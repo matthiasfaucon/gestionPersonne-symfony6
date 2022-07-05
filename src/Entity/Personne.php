@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\PersonneRepository;
+use App\Traits\TimeStampTrait;
 use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -13,6 +14,8 @@ use Doctrine\ORM\Mapping as ORM;
 
 class Personne
 {
+    use TimeStampTrait;
+    
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
@@ -38,12 +41,6 @@ class Personne
 
     #[ORM\ManyToOne(targetEntity: Job::class, inversedBy: 'personnes')]
     private $job;
-
-    #[ORM\Column(type: 'datetime', nullable: true)]
-    private $createdAt;
-
-    #[ORM\Column(type: 'datetime', nullable: true)]
-    private $updatedAt;
 
     public function __construct()
     {
@@ -150,36 +147,5 @@ class Personne
 
         return $this;
     }
-
-    public function getCreatedAt(): ?\DateTimeImmutable
-    {
-        return $this->createdAt;
-    }
-
-    public function setCreatedAt(?\DateTimeImmutable $createdAt): self
-    {
-        $this->createdAt = $createdAt;
-
-        return $this;
-    }
-
-    public function getUpdatedAt(): ?\DateTimeInterface
-    {
-        return $this->updatedAt;
-    }
-
-    #[ORM\PrePersist()]
-    public function onPrePersist()
-    {
-        $this->createdAt = new \DateTime();
-        $this->updatedAt = new \DateTime();
-    }
-
-    #[ORM\PreUpdate()]
-    public function onPreUpdate()
-    {
-        $this->updatedAt = new \DateTime();
-    }
-
     
 }
