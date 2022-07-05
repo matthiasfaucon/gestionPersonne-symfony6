@@ -136,7 +136,7 @@ class PersonneController extends AbstractController
         
         $manager->flush(); // exécute la transaction 
 
-        $this->addFlash('success', 'La personne a bien été supprimé');
+        $this->addFlash('success', 'Les données de la personne ont bien été modifié');
     }
     //sinon
     else{
