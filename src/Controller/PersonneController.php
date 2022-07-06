@@ -10,6 +10,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\String\Slugger\SluggerInterface;
 
 #[Route('personne')]
 
@@ -17,7 +18,7 @@ class PersonneController extends AbstractController
 {
 
     #[Route('/edit/{id?0}', name: 'personne.edit')]
-    public function addPerson(Personne $personne = null, ManagerRegistry $doctrine, Request $request): Response
+    public function addPerson(Personne $personne = null, ManagerRegistry $doctrine, Request $request, SluggerInterface $slugger): Response
     {
         $new = false;
         if (!$personne) {
@@ -32,6 +33,35 @@ class PersonneController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted()) {
+
+            $imageProfil = $form->get('image')->getData();
+
+            // $imageProfil n'est pas required alors on test son existence
+            if ($imageProfil) {
+
+                ////////// RENOMMER L'IMAGE ///////////////////////////
+
+                $originalFilename = pathinfo($imageProfil->getClientOriginalName(), PATHINFO_FILENAME);
+                // this is needed to safely include the file name as part of the URL
+                $safeFilename = $slugger->slug($originalFilename);
+                $newFilename = $safeFilename . '-' . uniqid() . '.' . $imageProfil->guessExtension();
+                /////////////////////////////////////////////////////
+
+                // Move the file to the directory where brochures are stored
+                try {
+                    // il déplace le $newFilename vers le paramètre brochures_directory
+                    $imageProfil->move(
+                        $this->getParameter('personne_directory'),
+                        $newFilename
+                    );
+                } catch (FileException $e) {
+                    // ... handle exception if something happens during file upload
+                }
+
+                // On rajoute l'image dans l'objet personne (avec son nouveau nom)
+                $personne->setImage($newFilename);
+            }
+
             $entiteManager = $doctrine->getManager();
             $entiteManager->persist($personne);
 

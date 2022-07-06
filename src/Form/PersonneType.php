@@ -8,9 +8,11 @@ use App\Entity\Profile;
 use Doctrine\ORM\EntityRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\File;
 
 class PersonneType extends AbstractType
 {
@@ -20,9 +22,26 @@ class PersonneType extends AbstractType
             ->add('nom')
             ->add('prenom')
             ->add('age')
-            ->add('image')
+            ->add('image', FileType::class, [
+                'label' => 'Déposez votre image de profil',
+                'mapped' => false,
+                'required' => false,
+                'constraints' => [
+                    new File([
+                        'maxSize' => '1024k',
+                        'mimeTypes' => [
+                            'image/gif',
+                            'image/jpg',
+                            'image/jpeg',
+                            'image/png'
+                        ],
+                        'mimeTypesMessage' => 'Veuillez insérer une image dans une des extensions suivantes: .gif, .jpg, .jpeg, .png',
+                    ])
+                ]
+            ])
             ->add('profile', EntityType::class, [
                 'expanded' => true,
+                'required' => false,
                 'class' => Profile::class,
                 'multiple' => false
             ])
