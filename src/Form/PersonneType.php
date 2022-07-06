@@ -17,8 +17,10 @@ class PersonneType extends AbstractType
             ->add('prenom')
             ->add('age')
             ->add('image')
-            ->add('ajouter', SubmitType::class)
-        ;
+            ->add('profile')
+            ->add('hobbies')
+            ->add('job')
+            ->add('ajouter', SubmitType::class);
     }
 
     public function configureOptions(OptionsResolver $resolver): void

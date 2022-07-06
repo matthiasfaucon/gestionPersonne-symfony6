@@ -16,27 +16,39 @@ use Symfony\Component\Routing\Annotation\Route;
 class PersonneController extends AbstractController
 {
 
-    #[Route('/add', name: 'personne.add')]
-    public function addPerson(ManagerRegistry $doctrine, Request $request): Response
+    #[Route('/edit/{id?0}', name: 'personne.edit')]
+    public function addPerson(Personne $personne = null, ManagerRegistry $doctrine, Request $request): Response
     {
-        $personne = new Personne(); //initialisation d'un constructeur 
+        $new = false;
+        if (!$personne) {
+            // mise à jour de la personne
+            $new = true;
+            $personne = new Personne();
+        }
+
         $repository = $doctrine->getRepository(Personne::class);
 
         $form = $this->createForm(PersonneType::class, $personne);
         $form->handleRequest($request);
 
-        if($form->isSubmitted()){
+        if ($form->isSubmitted()) {
             $entiteManager = $doctrine->getManager();
             $entiteManager->persist($personne);
-            
+
             $entiteManager->flush();
-            $this->addFlash('success', 'La personne a été ajoutée avec succès');
+
+            if ($new === true) {
+                $message = "a été créé avec succès";
+            } else {
+                $message = "a été édité avec succès";
+            }
+            $this->addFlash('success', $personne->getNom() . " " . $personne->getPrenom() . " " . $message);
             return $this->redirectToRoute('personne.list');
         }
-        
+
         return $this->render('personne/addPerson.html.twig', [
             'personne' => $personne,
-            'formPassed'=> $form->createView(),
+            'formPassed' => $form->createView(),
         ]);
     }
 
@@ -49,7 +61,7 @@ class PersonneController extends AbstractController
         $nbrPages = ceil($nbrPersonne / $nbrPerPage);
 
         $personnes = $repository->findBy([], [], $nbrPerPage, ($nbrPerPage * ($page - 1)));
-        
+
         return $this->render('personne/index.html.twig', [
             'personnes' => $personnes,
             'isPaginated' => true,
@@ -64,7 +76,7 @@ class PersonneController extends AbstractController
     {
         $repository = $doctrine->getRepository(Personne::class);
         $personnes = $repository->findPersonByAgeInterval($ageMin, $ageMax);
-        
+
         return $this->render('personne/index.html.twig', [
             'personnes' => $personnes
         ]);
@@ -75,7 +87,7 @@ class PersonneController extends AbstractController
     {
         $repository = $doctrine->getRepository(Personne::class);
         $stats = $repository->findPersonByAgeIntervalStatistic($ageMin, $ageMax);
-        
+
         return $this->render('personne/personStat.html.twig', [
             'stats' => $stats[0],
             'ageMin' => $ageMin,
@@ -90,7 +102,7 @@ class PersonneController extends AbstractController
         // $repository = $doctrine->getRepository(Personne::class);
         // $personne = $repository->find($id);
 
-        if(!$personne){
+        if (!$personne) {
             $this->addFlash('error', "la personne n'existe pas");
             return $this->redirectToRoute("personne.list");
         }
@@ -103,47 +115,20 @@ class PersonneController extends AbstractController
     #[Route('/delete/{id}', name: 'personne.delete')]
     public function deleteTodo(Personne $personne = null, ManagerRegistry $doctrine): RedirectResponse
     {
-    // On récupère la todo
+        // On récupère la todo
         // si elle existe
-    if($personne){
-        // suppression de la todo
-        $manager = $doctrine->getManager();
-        $manager->remove($personne);
-        $manager->flush(); // exécute la transaction 
-        $this->addFlash('success', 'La personne a bien été modifié');
-    }
-    //sinon
-    else{
-        //message d'erreur
-        $this->addFlash('error', 'La personne ne peut pas être supprimé, vérifiez son existence');
-    }
-        return $this->redirectToRoute('personne.list');  
-    }
-
-    #[Route('/update/{id}/{nom}/{prenom}/{age}', name: 'personne.update')]
-    public function updatePersonne(Personne $personne = null, ManagerRegistry $doctrine, $nom, $prenom, $age): RedirectResponse
-    {
-    // Vérifier que la personne existe
-        // si elle existe
-    if($personne){
-        // mise à jour de la personne
-        $manager = $doctrine->getManager();
-
-        $personne->setNom($nom);
-        $personne->setPrenom($prenom);
-        $personne->setAge($age);
-        $manager->persist($personne); // si il y a un id elle sait que c'est une mise à jour sinon elle sait que c'est un ajout 
-        
-        $manager->flush(); // exécute la transaction 
-
-        $this->addFlash('success', 'Les données de la personne ont bien été modifié');
-    }
-    //sinon
-    else{
-        //message d'erreur
-        $this->addFlash('error', 'La personne ne peut pas être supprimé, vérifiez son existence');
-    }
+        if ($personne) {
+            // suppression de la todo
+            $manager = $doctrine->getManager();
+            $manager->remove($personne);
+            $manager->flush(); // exécute la transaction 
+            $this->addFlash('success', 'La personne a bien été modifié');
+        }
+        //sinon
+        else {
+            //message d'erreur
+            $this->addFlash('error', 'La personne ne peut pas être supprimé, vérifiez son existence');
+        }
         return $this->redirectToRoute('personne.list');
     }
 }
-
