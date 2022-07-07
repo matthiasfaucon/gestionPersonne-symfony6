@@ -32,7 +32,7 @@ class PersonneController extends AbstractController
         $form = $this->createForm(PersonneType::class, $personne);
         $form->handleRequest($request);
 
-        if ($form->isSubmitted()) {
+        if ($form->isSubmitted() && $form->isValid()) {
 
             $imageProfil = $form->get('image')->getData();
 

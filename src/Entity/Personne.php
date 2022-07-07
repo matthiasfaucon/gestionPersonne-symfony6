@@ -8,6 +8,9 @@ use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
+
+
 
 #[ORM\Entity(repositoryClass: PersonneRepository::class)]
 #[ORM\HasLifecycleCallbacks()]
@@ -15,19 +18,28 @@ use Doctrine\ORM\Mapping as ORM;
 class Personne
 {
     use TimeStampTrait;
-    
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
     private $id;
 
     #[ORM\Column(type: 'string', length: 50)]
+    #[Assert\NotBlank(message: "veuillez renseigner ce champs")]
+    #[Assert\Length(min: 2, minMessage: "Veuillez mettre au moins 2 caractères")]
+    #[Assert\Regex('/\[A-Za-z]+/', message: "Veuillez ne pas saisir de nombre")]
     private $nom;
 
     #[ORM\Column(type: 'string', length: 200)]
+    #[Assert\NotBlank(message: "veuillez renseigner ce champs")]
+    #[Assert\Length(min: 2, minMessage: "Veuillez mettre au moins 2 caractères")]
+    #[Assert\Regex('/\[A-Za-z]+/', message: "Veuillez ne pas saisir de nombre")]
     private $prenom;
 
     #[ORM\Column(type: 'smallint')]
+    #[Assert\Positive]
+    #[Assert\NotBlank(message: "veuillez renseigner ce champs")]
+    #[Assert\Regex('/\d+/', message: "Veuillez ne pas saisir de lettres")]
     private $age;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
@@ -147,5 +159,4 @@ class Personne
 
         return $this;
     }
-    
 }
